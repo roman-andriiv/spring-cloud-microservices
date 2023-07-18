@@ -1,10 +1,14 @@
 package com.andriiv.currencyconversionservice;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Roman Andriiv (18.07.2023 - 22:13)
@@ -15,6 +19,18 @@ public class CurrencyConversionController {
     public CurrencyConversion calculateCurrencyConversion(@PathVariable String from,
                                                           @PathVariable String to,
                                                           @PathVariable BigDecimal quantity) {
-        return new CurrencyConversion(101L,from, to, quantity, BigDecimal.ONE, BigDecimal.ONE, "" );
+
+        Map<String, String> urlVariable = new HashMap<>();
+        urlVariable.put("from", from);
+        urlVariable.put("to", to);
+
+        ResponseEntity<CurrencyConversion> responseEntity = new RestTemplate().getForEntity(
+                "http://localhost:8000/currency-exchange/from/{from}/to/{to}", CurrencyConversion.class
+                , urlVariable);
+        CurrencyConversion currencyConversion = responseEntity.getBody();
+        return new CurrencyConversion(currencyConversion.getId(), from, to, quantity,
+                currencyConversion.getConversionMultiple(),
+                quantity.multiply(currencyConversion.getConversionMultiple()),
+                currencyConversion.getEnvironment());
     }
 }
