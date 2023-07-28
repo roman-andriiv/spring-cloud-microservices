@@ -22,6 +22,17 @@ services:
       - naming-server
     environment:
       EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka
+  api-gateway:
+    image: romanandriiv/spring-cloud-microservices-api-gateway:0.0.1-SNAPSHOT
+    mem_reservation: 700m
+    ports:
+      - "8765:8765"
+    networks:
+      - currency-network
+    depends_on:
+      - naming-server
+    environment:
+      EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka
   naming-server:
     image: romanandriiv/spring-cloud-microservices-naming-server:0.0.1-SNAPSHOT
     mem_reservation: 700m
